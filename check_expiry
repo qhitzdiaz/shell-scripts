@@ -33,7 +33,8 @@ else
 				elif [[ $OSTYPE = linux* ]]; then
 					_date_con=$(date -d "$_expirydate" +%Y-%m-%d);
 				elif [[ $OSTYPE = mysys* ]]; then
-					_date_con=$(date -d "$_expirydate" +%Y-%m-%d);
+					echo "Dude!? Why!??, please build a Unix-Like OS and run this script again, Good Job! Thank you!"
+					exit
 				elif [[ $OSTYPE = cygwin* ]]; then
 					_date_con=$(date -d "$_expirydate" +%Y-%m-%d);
 				fi
