@@ -1,6 +1,5 @@
 # shell-scripts
-# Check Expiry
-
+# Check Expiry (c) qhitz 20210425
 
 1. After Downloading
 2. cd shell-scripts
