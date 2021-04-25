@@ -1,0 +1,68 @@
+#/bin/bash
+# GNU
+# Usage:
+# ./check_expiry https://[tld] 
+# can also be used without https.
+
+
+_CHK_SSL_TLD_ () {
+if [ "$#" == "0" ]; then 
+	echo "You need to supply at least one argument!" 
+    	exit 1
+else
+	# parse https:// http://
+         _tld=$(echo $1 | sed 's~http[s]*://~~g');
+        
+	      	curl -I "$_tld" 2>&1 |grep -w "200\|301" >/dev/null
+		if [ $? -eq 0 ];
+		then
+			#echo "Site Found! Checking URL if has valid certificate..."
+			curl --insecure -vvI https://$_tld 2>&1 | awk 'BEGIN { cert=0 } /^\* Server certificate:/ { cert=1 } /^\*/ { if (cert) print }' | grep "SSL certificate verify ok" >/dev/null
+			if [ $? -eq 0 ];
+                	then
+                        	#_expiry=$(openssl s_client -servername _$tld -connect $_tld:443 2>/dev/null | openssl x509 -noout -dates |grep notAfter| awk -F "=" '{print $2}'| awk '{print $1,$2,$4,$3}');
+                        	# changed to curl to be fast
+                        	# echo "Certificate Found!"
+                        	_expirydate=$(curl --insecure -vvI https://$_tld 2>&1 | awk 'BEGIN { cert=0 } /^\* Server certificate:/ { cert=1 } /^\*/ { if (cert) print }' | grep "expire date" | awk '{print $5,$4,$7}');
+                        	_expirytime=$(curl --insecure -vvI https://$_tld 2>&1 | awk 'BEGIN { cert=0 } /^\* Server certificate:/ { cert=1 } /^\*/ { if (cert) print }' | grep "expire date" | awk '{print $6}');
+				# convert date to satisfy requirments
+				# I use OSX, it uses different date commands
+				# Checking OS
+				if [[ $OSTYPE = darwin* ]]; then
+					_date_con=$(date -j -f "%d %b %Y" "$_expirydate" +%Y-%m-%d);
+				elif [[ $OSTYPE = linux* ]]; then
+					_date_con=$(date -d "$_expirydate" +%Y-%m-%d);
+				elif [[ $OSTYPE = mysys* ]]; then
+					_date_con=$(date -d "$_expirydate" +%Y-%m-%d);
+				elif [[ $OSTYPE = cygwin* ]]; then
+					_date_con=$(date -d "$_expirydate" +%Y-%m-%d);
+				fi
+				echo $_date_con $_expirytime
+               		else
+                        	echo "The site $_tld does not Valid Certificate"
+               		fi
+		else
+			echo "Site $_tld Not Found!"
+		fi
+
+fi 
+} 
+_CHK_TOOLS_ () {
+if ! command -v curl &> /dev/null
+then
+    echo "curl could not be found, please install and run this script again"
+    exit
+fi
+if ! command -v wget &> /dev/null
+then
+    echo "wget could not be found, please install and run this script again"
+    exit
+fi
+if ! command -v openssl &> /dev/null
+then
+    echo "openssl could not be found, please install and run this script again"
+    exit
+fi
+}
+_CHK_TOOLS_
+_CHK_SSL_TLD_ $1
