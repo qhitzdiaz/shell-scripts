@@ -38,6 +38,7 @@ else
 				elif [[ $OSTYPE = cygwin* ]]; then
 					_date_con=$(date -d "$_expirydate" +%Y-%m-%d);
 				fi
+				# Display Output
 				echo $_date_con $_expirytime
                		else
                         	echo "The site $_tld does not Valid Certificate"
@@ -49,6 +50,8 @@ else
 fi 
 } 
 _CHK_TOOLS_ () {
+# Checks all necessary tools for this script to work.
+
 if ! command -v curl &> /dev/null
 then
     echo "curl could not be found, please install and run this script again"
@@ -65,5 +68,7 @@ then
     exit
 fi
 }
+
+# Main
 _CHK_TOOLS_
 _CHK_SSL_TLD_ $1
