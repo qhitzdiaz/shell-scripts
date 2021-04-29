@@ -1,5 +1,7 @@
 # shell-scripts
 # Check Expiry (c) qhitz 20210425
+# pre-requiste
+# curl, wget (optional), openssl (optional).
 
 1. After Downloading
 2. cd shell-scripts
